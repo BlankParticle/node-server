@@ -167,6 +167,7 @@ export const serveStatic = <E extends Env = any>(
     let result
     const size = stats.size
     const range = c.req.header('range') || ''
+    c.header('Last-Modified', stats.mtime.toUTCString())
 
     if (c.req.method == 'HEAD' || c.req.method == 'OPTIONS') {
       c.header('Content-Length', size.toString())
@@ -177,7 +178,6 @@ export const serveStatic = <E extends Env = any>(
       result = c.body(createStreamBody(createReadStream(path)), 200)
     } else {
       c.header('Accept-Ranges', 'bytes')
-      c.header('Date', stats.birthtime.toUTCString())
 
       const parts = range.replace(/bytes=/, '').split('-', 2)
       const start = parseInt(parts[0], 10) || 0
